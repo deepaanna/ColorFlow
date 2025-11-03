@@ -2,7 +2,7 @@
   "name": "Color Flow - Premium Puzzle Game",
   "short_name": "Color Flow",
   "description": "A beautiful and challenging color connection puzzle game",
-  "start_url": "/color-flow-game.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#1a1a2e",

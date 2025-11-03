@@ -2,7 +2,7 @@
 const CACHE_NAME = 'color-flow-v1';
 const urlsToCache = [
   '/',
-  '/color-flow-game.html'
+  '/index.html'
 ];
 
 self.addEventListener('install', event => {
