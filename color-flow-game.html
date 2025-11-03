@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Color Flow - Premium Puzzle Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --bg-dark: #1a1a2e;
+            --bg-medium: #16213e;
+            --bg-light: #0f3460;
+            --text-primary: #ffffff;
+            --text-secondary: #b8b8d1;
+            --accent: #e94560;
+            --shadow-strong: 0 10px 30px rgba(0,0,0,0.5);
+            --shadow-medium: 0 5px 15px rgba(0,0,0,0.3);
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .background-animation {
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(245, 87, 108, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 20%, rgba(79, 172, 254, 0.1) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: rotate(0deg) translate(0, 0); }
+            33% { transform: rotate(120deg) translate(-10px, -20px); }
+            66% { transform: rotate(240deg) translate(10px, 10px); }
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .game-title {
+            font-size: 42px;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+            text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition-fast);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow-strong);
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-board::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            to { left: 100%; }
+        }
+
+        .grid {
+            display: grid;
+            gap: 3px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition-fast);
+            background: var(--bg-medium);
+            border: 2px solid transparent;
+            overflow: hidden;
+        }
+
+        .cell::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            transition: all 0.5s ease;
+        }
+
+        .cell.filled::before {
+            width: 120%;
+            height: 120%;
+        }
+
+        .cell:hover:not(.source):not(.filled) {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .cell.source {
+            cursor: default;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            animation: pulse 2s infinite;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 10;
+            position: relative;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .cell.animating {
+            animation: fillAnimation 0.3s ease;
+        }
+
+        @keyframes fillAnimation {
+            0% { transform: scale(0.8) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        .color-palette {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .color-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 15px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .color-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .color-btn:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .color-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        .color-btn.selected {
+            border-color: white;
+            transform: scale(1.15);
+            box-shadow: 0 0 20px currentColor;
+            animation: selectedPulse 1s infinite;
+        }
+
+        @keyframes selectedPulse {
+            0%, 100% { box-shadow: 0 0 20px currentColor; }
+            50% { box-shadow: 0 0 30px currentColor, 0 0 40px currentColor; }
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .btn:hover::before {
+            width: 300%;
+            height: 300%;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-gradient);
+            box-shadow: 0 4px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px;
+            border-radius: 12px;
+        }
+
+        .difficulty-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .difficulty-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+        }
+
+        .victory-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .victory-modal.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .victory-content {
+            background: var(--bg-medium);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow-strong);
+            animation: victoryBounce 0.5s ease;
+        }
+
+        @keyframes victoryBounce {
+            0% { transform: scale(0.8) translateY(-50px); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .victory-title {
+            font-size: 36px;
+            font-weight: 800;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .victory-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .victory-stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: particle-fall 3s linear;
+        }
+
+        @keyframes particle-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--success-gradient);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(79, 172, 254, 0.5);
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .timer.warning {
+            color: var(--accent);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 480px) {
+            .game-title {
+                font-size: 32px;
+            }
+            
+            .color-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .cell {
+                border-radius: 6px;
+            }
+            
+            .stat-value {
+                font-size: 20px;
+            }
+        }
+
+        /* Haptic feedback simulation */
+        .haptic {
+            animation: haptic 0.1s;
+        }
+
+        @keyframes haptic {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        /* Performance optimizations */
+        .cell, .color-btn, .btn {
+            will-change: transform;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-perspective: 1000px;
+            perspective: 1000px;
+        }
+
+        /* Smooth scrolling for mobile */
+        html {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Prevent text selection on mobile */
+        * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+		/* ---------- Tutorial Overlay ---------- */
+		.tutorial-overlay {
+			position: fixed;
+			inset: 0;
+			background: rgba(0,0,0,0.85);
+			backdrop-filter: blur(10px);
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			z-index: 2000;
+			animation: fadeIn 0.6s ease forwards;
+		}
+
+		.tutorial-content {
+			background: var(--bg-medium);
+			padding: 40px 30px;
+			border-radius: 20px;
+			text-align: center;
+			max-width: 400px;
+			color: var(--text-primary);
+			border: 1px solid rgba(255,255,255,0.1);
+			box-shadow: var(--shadow-strong);
+			animation: popIn 0.5s ease;
+		}
+
+		@keyframes popIn {
+		  0% {transform: scale(0.8); opacity: 0;}
+		  100% {transform: scale(1); opacity: 1;}
+		}
+
+		@keyframes fadeIn {
+		  from {opacity: 0;}
+		  to {opacity: 1;}
+		}
+    </style>
+</head>
+<body>
+    <div class="background-animation"></div>
+    
+    <div class="game-container">
+        <div class="header">
+            <h1 class="game-title">COLOR FLOW</h1>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Level</div>
+                <div class="stat-value" id="level">1</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Moves</div>
+                <div class="stat-value" id="moves">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Score</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+        </div>
+
+        <div class="timer" id="timer">Time: 0:00</div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress" style="width: 0%"></div>
+        </div>
+
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
+            <button class="difficulty-btn" data-difficulty="medium">Medium</button>
+            <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+            <button class="difficulty-btn" data-difficulty="expert">Expert</button>
+        </div>
+
+        <div class="game-board">
+            <div class="grid" id="grid"></div>
+        </div>
+
+        <div class="color-palette" id="colorPalette"></div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="game.hint()">💡 Hint</button>
+            <button class="btn btn-secondary" onclick="game.reset()">🔄 Reset</button>
+        </div>
+    </div>
+
+    <div class="victory-modal" id="victoryModal">
+        <div class="victory-content">
+            <h2 class="victory-title">🎉 VICTORY!</h2>
+            <div class="victory-stats">
+                <div class="victory-stat">
+                    <div class="stat-label">Final Score</div>
+                    <div class="stat-value" id="finalScore">0</div>
+                </div>
+                <div class="victory-stat">
+                    <div class="stat-label">Time</div>
+                    <div class="stat-value" id="finalTime">0:00</div>
+                </div>
+                <div class="victory-stat">
+                    <div class="stat-label">Moves Used</div>
+                    <div class="stat-value" id="finalMoves">0</div>
+                </div>
+                <div class="victory-stat">
+                    <div class="stat-label">Efficiency</div>
+                    <div class="stat-value" id="efficiency">100%</div>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="game.nextLevel()">Next Level →</button>
+        </div>
+    </div>
+
+    <div class="particles" id="particles"></div>
+	
+	<!-- Onboarding / Tutorial Overlay -->
+	<div id="tutorialOverlay" class="tutorial-overlay">
+	  <div class="tutorial-content">
+		<h2>🌈 Welcome to Color Flow</h2>
+		<p>1️⃣  Pick a <strong>color</strong> from the palette below.</p>
+		<p>2️⃣  Tap empty <strong>cells</strong> next to that color to fill them.</p>
+		<p>3️⃣  Fill the whole grid so all same-colored cells connect!</p>
+
+		<button id="tutorialStartBtn" class="btn btn-primary">Got It →</button>
+	  </div>
+	</div>
+
+    <script>
+        class ColorFlowGame {
+            constructor() {
+                this.colors = [
+                    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+                    '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'
+                ];
+                
+                this.difficulties = {
+                    easy: { size: 6, colors: 4, timeLimit: null },
+                    medium: { size: 8, colors: 5, timeLimit: 180 },
+                    hard: { size: 10, colors: 6, timeLimit: 120 },
+                    expert: { size: 12, colors: 7, timeLimit: 90 }
+                };
+                
+                this.currentDifficulty = 'easy';
+                this.gridSize = 6;
+                this.numColors = 4;
+                this.grid = [];
+                this.sources = [];
+                this.selectedColor = null;
+                this.moves = 0;
+                this.score = 0;
+                this.level = 1;
+                this.startTime = null;
+                this.timerInterval = null;
+                this.timeLimit = null;
+                this.isVictory = false;
+                this.optimalMoves = 0;
+                
+                this.init();
+                this.setupEventListeners();
+            }
+            
+            init() {
+                this.setupDifficulty(this.currentDifficulty);
+                this.generateLevel();
+                this.render();
+                this.startTimer();
+            }
+            
+            setupDifficulty(difficulty) {
+                const config = this.difficulties[difficulty];
+                this.gridSize = config.size;
+                this.numColors = config.colors;
+                this.timeLimit = config.timeLimit;
+                this.currentDifficulty = difficulty;
+                
+                // Update UI
+                document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.difficulty === difficulty);
+                });
+            }
+            
+            generateLevel() {
+                // Reset grid
+                this.grid = Array(this.gridSize).fill(null).map(() => 
+                    Array(this.gridSize).fill(null)
+                );
+                this.sources = [];
+                this.moves = 0;
+                this.isVictory = false;
+                
+                // Calculate positions for sources
+                const positions = this.generateSourcePositions();
+                
+                // Place sources
+                positions.forEach((pos, index) => {
+                    const colorIndex = index % this.numColors;
+                    this.grid[pos.y][pos.x] = {
+                        color: this.colors[colorIndex],
+                        isSource: true,
+                        sourceId: index
+                    };
+                    this.sources.push({ x: pos.x, y: pos.y, color: this.colors[colorIndex] });
+                });
+                
+                // Calculate optimal moves (simplified)
+                this.optimalMoves = this.gridSize * this.gridSize - this.sources.length;
+                
+                this.updateStats();
+            }
+            
+            generateSourcePositions() {
+                const positions = [];
+                const pairs = Math.floor(this.numColors / 2) + (this.numColors % 2);
+                
+                // Generate strategic positions
+                for (let i = 0; i < this.numColors; i++) {
+                    let x, y;
+                    do {
+                        if (i < pairs) {
+                            // Place in corners and edges for first half
+                            const edge = Math.floor(Math.random() * 4);
+                            switch(edge) {
+                                case 0: x = 0; y = Math.floor(Math.random() * this.gridSize); break;
+                                case 1: x = this.gridSize - 1; y = Math.floor(Math.random() * this.gridSize); break;
+                                case 2: x = Math.floor(Math.random() * this.gridSize); y = 0; break;
+                                case 3: x = Math.floor(Math.random() * this.gridSize); y = this.gridSize - 1; break;
+                            }
+                        } else {
+                            // Random for others
+                            x = Math.floor(Math.random() * this.gridSize);
+                            y = Math.floor(Math.random() * this.gridSize);
+                        }
+                    } while (positions.some(pos => pos.x === x && pos.y === y));
+                    
+                    positions.push({ x, y });
+                }
+                
+                return positions;
+            }
+            
+            render() {
+                this.renderGrid();
+                this.renderPalette();
+            }
+            
+            renderGrid() {
+                const gridEl = document.getElementById('grid');
+                gridEl.innerHTML = '';
+                gridEl.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
+                
+                for (let y = 0; y < this.gridSize; y++) {
+                    for (let x = 0; x < this.gridSize; x++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.x = x;
+                        cell.dataset.y = y;
+                        
+                        const cellData = this.grid[y][x];
+                        if (cellData) {
+                            if (cellData.isSource) {
+                                cell.classList.add('source');
+                                cell.textContent = this.sources.findIndex(s => s.x === x && s.y === y) + 1;
+                            } else {
+                                cell.classList.add('filled');
+                            }
+                            cell.style.background = cellData.color;
+                            const rgb = this.hexToRgb(cellData.color);
+                            cell.style.setProperty('--cell-color', cellData.color);
+                            cell.querySelector('::before')?.style.setProperty('background', cellData.color);
+                        }
+                        
+                        cell.addEventListener('click', () => this.handleCellClick(x, y));
+                        gridEl.appendChild(cell);
+                    }
+                }
+            }
+            
+            renderPalette() {
+                const palette = document.getElementById('colorPalette');
+                palette.innerHTML = '';
+                
+                for (let i = 0; i < this.numColors; i++) {
+                    const btn = document.createElement('div');
+                    btn.className = 'color-btn';
+                    btn.style.background = this.colors[i];
+                    btn.dataset.color = this.colors[i];
+                    
+                    if (this.selectedColor === this.colors[i]) {
+                        btn.classList.add('selected');
+                    }
+                    
+                    btn.addEventListener('click', () => this.selectColor(this.colors[i]));
+                    palette.appendChild(btn);
+                }
+            }
+            
+            selectColor(color) {
+                this.selectedColor = color;
+                this.playSound('select');
+                this.addHaptic(event.target);
+                this.renderPalette();
+            }
+            
+            handleCellClick(x, y) {
+                if (!this.selectedColor || this.isVictory) return;
+                
+                const cell = this.grid[y][x];
+                if (cell && cell.isSource) return;
+                
+                // Check if adjacent to source or filled cell of same color
+                if (this.isValidMove(x, y, this.selectedColor)) {
+                    this.fillCell(x, y, this.selectedColor);
+                    this.moves++;
+                    this.updateStats();
+                    this.playSound('fill');
+                    this.animateCell(x, y);
+                    
+                    if (this.checkVictory()) {
+                        this.handleVictory();
+                    }
+                }
+            }
+            
+            isValidMove(x, y, color) {
+                if (this.grid[y][x] !== null) return false;
+                
+                // Check adjacent cells
+                const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+                for (const [dx, dy] of directions) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    
+                    if (nx >= 0 && nx < this.gridSize && ny >= 0 && ny < this.gridSize) {
+                        const adjacent = this.grid[ny][nx];
+                        if (adjacent && adjacent.color === color) {
+                            return true;
+                        }
+                    }
+                }
+                
+                return false;
+            }
+            
+            fillCell(x, y, color) {
+                this.grid[y][x] = { color, isSource: false };
+                this.renderGrid();
+                this.updateProgress();
+            }
+            
+            animateCell(x, y) {
+                const cells = document.querySelectorAll('.cell');
+                const index = y * this.gridSize + x;
+                cells[index].classList.add('animating');
+                setTimeout(() => cells[index].classList.remove('animating'), 300);
+            }
+            
+            updateProgress() {
+                let filledCells = 0;
+                for (let y = 0; y < this.gridSize; y++) {
+                    for (let x = 0; x < this.gridSize; x++) {
+                        if (this.grid[y][x] !== null) filledCells++;
+                    }
+                }
+                
+                const progress = (filledCells / (this.gridSize * this.gridSize)) * 100;
+                document.getElementById('progress').style.width = `${progress}%`;
+            }
+            
+            checkVictory() {
+                // Check if all cells are filled
+                for (let y = 0; y < this.gridSize; y++) {
+                    for (let x = 0; x < this.gridSize; x++) {
+                        if (this.grid[y][x] === null) return false;
+                    }
+                }
+                
+                // Check if all same-colored cells are connected
+                return this.checkConnectivity();
+            }
+            
+            checkConnectivity() {
+                const visited = Array(this.gridSize).fill(null).map(() => 
+                    Array(this.gridSize).fill(false)
+                );
+                
+                for (const source of this.sources) {
+                    const color = source.color;
+                    const connected = new Set();
+                    this.dfs(source.x, source.y, color, visited, connected);
+                    
+                    // Check if all cells of this color are connected
+                    let totalColorCells = 0;
+                    for (let y = 0; y < this.gridSize; y++) {
+                        for (let x = 0; x < this.gridSize; x++) {
+                            if (this.grid[y][x] && this.grid[y][x].color === color) {
+                                totalColorCells++;
+                            }
+                        }
+                    }
+                    
+                    if (connected.size !== totalColorCells) return false;
+                }
+                
+                return true;
+            }
+            
+            dfs(x, y, color, visited, connected) {
+                if (x < 0 || x >= this.gridSize || y < 0 || y >= this.gridSize) return;
+                if (visited[y][x]) return;
+                if (!this.grid[y][x] || this.grid[y][x].color !== color) return;
+                
+                visited[y][x] = true;
+                connected.add(`${x},${y}`);
+                
+                this.dfs(x - 1, y, color, visited, connected);
+                this.dfs(x + 1, y, color, visited, connected);
+                this.dfs(x, y - 1, color, visited, connected);
+                this.dfs(x, y + 1, color, visited, connected);
+            }
+            
+            handleVictory() {
+                this.isVictory = true;
+                this.stopTimer();
+                
+                const efficiency = Math.max(0, Math.round((this.optimalMoves / this.moves) * 100));
+                const bonusScore = Math.round(1000 * (efficiency / 100) * (this.level / 10));
+                this.score += bonusScore;
+                
+                // Update victory modal
+                document.getElementById('finalScore').textContent = this.score;
+                document.getElementById('finalMoves').textContent = this.moves;
+                document.getElementById('finalTime').textContent = this.getTimeString();
+                document.getElementById('efficiency').textContent = `${efficiency}%`;
+                
+                // Show modal
+                document.getElementById('victoryModal').classList.add('show');
+                
+                // Create particle effects
+                this.createParticles();
+                this.playSound('victory');
+            }
+            
+            createParticles() {
+                const container = document.getElementById('particles');
+                container.innerHTML = '';
+                
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'particle';
+                        particle.style.left = Math.random() * 100 + '%';
+                        particle.style.background = this.colors[Math.floor(Math.random() * this.colors.length)];
+                        particle.style.animationDelay = Math.random() * 0.5 + 's';
+                        container.appendChild(particle);
+                        
+                        setTimeout(() => particle.remove(), 3000);
+                    }, i * 50);
+                }
+            }
+            
+            hint() {
+                if (this.isVictory) return;
+                
+                // Find a valid move
+                for (let y = 0; y < this.gridSize; y++) {
+                    for (let x = 0; x < this.gridSize; x++) {
+                        if (this.grid[y][x] === null) {
+                            for (const color of this.colors.slice(0, this.numColors)) {
+                                if (this.isValidMove(x, y, color)) {
+                                    // Highlight the cell
+                                    const cells = document.querySelectorAll('.cell');
+                                    const index = y * this.gridSize + x;
+                                    cells[index].style.animation = 'pulse 1s 3';
+                                    setTimeout(() => {
+                                        cells[index].style.animation = '';
+                                    }, 3000);
+                                    
+                                    // Select the color
+                                    this.selectColor(color);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            reset() {
+                this.stopTimer();
+                this.generateLevel();
+                this.render();
+                this.startTimer();
+            }
+            
+            nextLevel() {
+                this.level++;
+                
+                // Increase difficulty every 3 levels
+                if (this.level % 3 === 0) {
+                    const difficulties = Object.keys(this.difficulties);
+                    const currentIndex = difficulties.indexOf(this.currentDifficulty);
+                    if (currentIndex < difficulties.length - 1) {
+                        this.setupDifficulty(difficulties[currentIndex + 1]);
+                    }
+                }
+                
+                document.getElementById('victoryModal').classList.remove('show');
+                this.reset();
+            }
+            
+            startTimer() {
+                this.startTime = Date.now();
+                this.timerInterval = setInterval(() => this.updateTimer(), 100);
+            }
+            
+            stopTimer() {
+                clearInterval(this.timerInterval);
+            }
+            
+            updateTimer() {
+                const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+                const timeString = this.getTimeString();
+                const timerEl = document.getElementById('timer');
+                
+                if (this.timeLimit) {
+                    const remaining = this.timeLimit - elapsed;
+                    timerEl.textContent = `Time: ${this.formatTime(remaining)}`;
+                    
+                    if (remaining <= 10) {
+                        timerEl.classList.add('warning');
+                    } else {
+                        timerEl.classList.remove('warning');
+                    }
+                    
+                    if (remaining <= 0) {
+                        this.handleTimeout();
+                    }
+                } else {
+                    timerEl.textContent = `Time: ${timeString}`;
+                }
+            }
+            
+            handleTimeout() {
+                this.stopTimer();
+                alert('Time\'s up! Try again.');
+                this.reset();
+            }
+            
+            getTimeString() {
+                const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+                return this.formatTime(elapsed);
+            }
+            
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            updateStats() {
+                document.getElementById('level').textContent = this.level;
+                document.getElementById('moves').textContent = this.moves;
+                document.getElementById('score').textContent = this.score;
+            }
+            
+            playSound(type) {
+                // Web Audio API for sound effects
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                switch(type) {
+                    case 'select':
+                        oscillator.frequency.value = 600;
+                        gainNode.gain.value = 0.1;
+                        break;
+                    case 'fill':
+                        oscillator.frequency.value = 800;
+                        gainNode.gain.value = 0.05;
+                        break;
+                    case 'victory':
+                        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.3);
+                        gainNode.gain.value = 0.1;
+                        break;
+                }
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.1);
+            }
+            
+            addHaptic(element) {
+                if (element) {
+                    element.classList.add('haptic');
+                    setTimeout(() => element.classList.remove('haptic'), 100);
+                }
+                
+                // Trigger device haptic feedback if available
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(10);
+                }
+            }
+            
+            hexToRgb(hex) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            }
+            
+            setupEventListeners() {
+                // Difficulty buttons
+                document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.setupDifficulty(btn.dataset.difficulty);
+                        this.reset();
+                    });
+                });
+                
+                // Prevent zoom on double tap
+                let lastTouchEnd = 0;
+                document.addEventListener('touchend', (e) => {
+                    const now = Date.now();
+                    if (now - lastTouchEnd <= 300) {
+                        e.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, false);
+                
+                // Handle orientation change
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(() => this.renderGrid(), 100);
+                });
+            }
+        }
+        
+        // Initialize game
+        const game = new ColorFlowGame();
+        
+		// --- Tutorial Overlay Logic ---
+		const tutorialOverlay = document.getElementById('tutorialOverlay');
+		const tutorialStartBtn = document.getElementById('tutorialStartBtn');
+
+		if (localStorage.getItem('colorflow_tutorial_done') !== '1') {
+		  tutorialOverlay.style.display = 'flex';
+		} else {
+		  tutorialOverlay.style.display = 'none';
+		}
+
+		tutorialStartBtn.addEventListener('click', () => {
+		  tutorialOverlay.style.animation = 'fadeOut 0.4s forwards';
+		  setTimeout(() => tutorialOverlay.remove(), 400);
+		  localStorage.setItem('colorflow_tutorial_done', '1');
+		});
+
+		// Fade-out keyframe
+		const style = document.createElement('style');
+		style.textContent = `
+		@keyframes fadeOut {
+		  to {opacity: 0; visibility: hidden;}
+		}`;
+		document.head.appendChild(style);
+
+        // Service Worker for offline support
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+    </script>
+</body>
+</html>
