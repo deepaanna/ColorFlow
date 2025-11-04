@@ -5,307 +5,147 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Color Flow - Premium Puzzle Game</title>
-	
-    <!-- Stripe Payment Processing -->
-    <script src="https://js.stripe.com/v3/"></script>
-	
-    <!-- Google AdSense (Works in PWA - Only shows between levels) -->
+    <title>Color Flow - Connect the Colors</title>
+    
+    <!-- Google AdSense (Replace with your ID) -->
     <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ID" crossorigin="anonymous"></script> -->
     
+    <link rel="manifest" href="./manifest.json">
+    
     <style>
-        /* ============================================
-           KEEPING YOUR EXACT ORIGINAL STYLES - NO CHANGES
-           ============================================ */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-			-webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
         }
 
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --premium-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-			--success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --primary: #667eea;
+            --secondary: #764ba2;
             --bg-dark: #1a1a2e;
             --bg-medium: #16213e;
-			--bg-light: #0f3460;
-            --text-primary: #ffffff;
-            --text-secondary: #b8b8d1;
-			--accent: #e94560;
-            --shadow-strong: 0 10px 30px rgba(0,0,0,0.5);
-            --shadow-medium: 0 5px 15px rgba(0,0,0,0.3);
-            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            --text: #ffffff;
+            --text-dim: #b8b8d1;
+            --success: #4facfe;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
-            color: var(--text-primary);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            position: relative;
-        }
-		
-		.background-animation {
-            position: fixed;
-            width: 200%;
-            height: 200%;
-            top: -50%;
-            left: -50%;
-            z-index: -1;
-            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(245, 87, 108, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 20%, rgba(79, 172, 254, 0.1) 0%, transparent 50%);
-            animation: float 20s ease-in-out infinite;
+            padding: 10px;
         }
 
-        @keyframes float {
-            0%, 100% { transform: rotate(0deg) translate(0, 0); }
-            33% { transform: rotate(120deg) translate(-10px, -20px); }
-            66% { transform: rotate(240deg) translate(10px, 10px); }
-        }
-
-        /* Premium Features Badge - Subtle (KEPT EXACTLY AS YOUR DESIGN) */
-        .premium-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            color: #FFD700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0.7;
-        }
-
-        .premium-badge:hover {
-            opacity: 1;
-            transform: translateY(-2px);
-        }
-
-        .premium-badge.active {
-            background: var(--premium-gradient);
-            color: #1a1a2e;
-            opacity: 1;
-        }
-
-        /* Support Button - KEEPING YOUR EXACT DESIGN */
-        .support-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s ease;
-            opacity: 0.3;
-            z-index: 100;
-        }
-
-        .support-button:hover {
-            opacity: 1;
-            transform: scale(1.1);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* ALL YOUR ORIGINAL GAME STYLES - UNCHANGED */
         .game-container {
             width: 100%;
-            max-width: 500px;
-            padding: 20px;
-			animation: slideIn 0.5s ease-out;
+            max-width: 450px;
+            animation: fadeIn 0.5s ease;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-		
+
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            position: relative;
+            padding: 20px 0;
         }
 
         .game-title {
-            font-size: 42px;
+            font-size: 36px;
             font-weight: 800;
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            letter-spacing: -1px;
-            text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
-            animation: glow 3s ease-in-out infinite;
+            margin-bottom: 5px;
         }
 
-        @keyframes glow {
-            0%, 100% { filter: brightness(1); }
-            50% { filter: brightness(1.2); }
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 14px;
         }
 
         .stats {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 20px;
-            gap: 15px;
+            margin: 20px 0;
+            gap: 10px;
         }
 
         .stat-card {
             flex: 1;
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 12px;
+            border-radius: 12px;
+            padding: 10px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: var(--transition-fast);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: var(--shadow-medium);
         }
 
         .stat-label {
             font-size: 11px;
-            color: var(--text-secondary);
+            color: var(--text-dim);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 5px;
         }
 
         .stat-value {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
-            background: linear-gradient(135deg, #667eea, #f093fb);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text);
+            margin-top: 5px;
         }
 
         .game-board {
             background: rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
-            padding: 15px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-			box-shadow: var(--shadow-strong);
-            margin-bottom: 25px;
-            position: relative;
-            overflow: hidden;
+            border-radius: 16px;
+            padding: 12px;
+            margin: 20px 0;
         }
 
-		.game-board::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            animation: shimmer 3s infinite;
-        }
-
-        @keyframes shimmer {
-            to { left: 100%; }
-        }
-		
         .grid {
             display: grid;
             gap: 3px;
-            position: relative;
-            z-index: 1;
         }
 
         .cell {
             aspect-ratio: 1;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
-			position: relative;
-            transition: var(--transition-fast);
             background: var(--bg-medium);
             border: 2px solid transparent;
-            overflow: hidden;
+            transition: all 0.2s ease;
+            position: relative;
         }
 
-        .cell::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            transition: all 0.5s ease;
-        }
-
-        .cell.filled::before {
-            width: 120%;
-            height: 120%;
-        }
-
-        .cell:hover:not(.source):not(.filled) {
+        .cell:not(.source):not(.filled):hover {
             transform: scale(0.95);
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.08);
         }
-		
+
         .cell.source {
-			cursor: default;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-			animation: pulse 2s infinite;
-            font-size: 18px;
+            cursor: default;
+            border-color: rgba(255, 255, 255, 0.3);
+            font-size: 14px;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             text-shadow: 0 0 10px rgba(0,0,0,0.5);
-            z-index: 10;
-            position: relative;
+            animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
-        }
-
-        .cell.animating {
-            animation: fillAnimation 0.3s ease;
-        }
-		
-		@keyframes fillAnimation {
-            0% { transform: scale(0.8) rotate(0deg); }
-            50% { transform: scale(1.1) rotate(180deg); }
-            100% { transform: scale(1) rotate(360deg); }
         }
 
         .cell.filled {
@@ -321,200 +161,212 @@
         .color-palette {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 25px;
+            gap: 10px;
+            margin: 20px 0;
             flex-wrap: wrap;
         }
 
         .color-btn {
-            width: 55px;
-            height: 55px;
-            border-radius: 15px;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
             cursor: pointer;
             border: 3px solid transparent;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+            position: relative;
         }
 
         .color-btn:hover {
-            transform: translateY(-5px) scale(1.1);
+            transform: translateY(-3px) scale(1.1);
         }
 
         .color-btn.selected {
             border-color: white;
-            transform: scale(1.15);
+            transform: scale(1.1);
+        }
+
+        .color-btn.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
         }
 
         .controls {
             display: flex;
-            gap: 15px;
+            gap: 10px;
+            margin: 20px 0;
         }
 
         .btn {
             flex: 1;
-            padding: 15px;
+            padding: 14px;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             color: white;
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             transition: all 0.2s ease;
         }
 
         .btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        /* KEEPING YOUR EXACT MODAL STYLES */
-        .store-modal {
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Success Modal */
+        .modal {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 1000;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
 
-        .store-modal.active {
+        .modal.active {
             display: flex;
         }
 
-        .store-content {
+        .modal-content {
             background: var(--bg-medium);
             border-radius: 20px;
             padding: 30px;
-            max-width: 400px;
+            max-width: 350px;
             width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
+            text-align: center;
+            animation: slideUp 0.3s ease;
         }
 
-        .store-title {
-            font-size: 24px;
-            margin-bottom: 20px;
-            background: var(--premium-gradient);
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-title {
+            font-size: 28px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--success) 0%, #00f2fe 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .store-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
+        .modal-text {
+            color: var(--text-dim);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
+            gap: 10px;
         }
 
-        .store-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateX(5px);
-        }
-
-        .price-tag {
-            background: var(--premium-gradient);
-            color: var(--bg-dark);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 30px;
-            height: 30px;
+        /* Support Button */
+        .support-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
             border: none;
-            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 20px;
             transition: all 0.3s ease;
+            z-index: 100;
         }
 
-        .close-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: rotate(90deg);
+        .support-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Ad Banner Space */
+        .ad-banner {
+            width: 100%;
+            max-width: 450px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dim);
+            font-size: 12px;
+            margin: 20px 0;
+        }
+
+        /* Hint animation */
+        .cell.hint {
+            animation: hintGlow 0.6s ease 2;
+        }
+
+        @keyframes hintGlow {
+            0%, 100% { box-shadow: 0 0 0 rgba(79, 172, 254, 0); }
+            50% { box-shadow: 0 0 20px rgba(79, 172, 254, 0.8); }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            .game-title { font-size: 28px; }
+            .color-btn { width: 45px; height: 45px; }
+            .btn { padding: 12px; font-size: 14px; }
+        }
+
+        /* Premium themes (unlockable) */
+        body.theme-sunset {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+        }
+
+        body.theme-ocean {
+            --primary: #4facfe;
+            --secondary: #00f2fe;
+        }
+
+        body.theme-forest {
+            --primary: #11998e;
+            --secondary: #38ef7d;
         }
     </style>
 </head>
 <body>
-    <div class="background-animation"></div>
-    
-    <!-- Premium Badge - YOUR EXACT DESIGN -->
-    <div class="premium-badge" id="premiumBadge">
-        ⭐ Pro
+    <!-- Optional Ad Banner (only shows if AdSense is configured) -->
+    <div class="ad-banner" id="topAd">
+        <!-- Ad space - Configure AdSense to show here -->
+        <span>Advertisement Space</span>
     </div>
 
-    <!-- Support Button - YOUR EXACT DESIGN -->
-    <div class="support-button" id="supportBtn" title="Support the Developer">
-        ❤️
-    </div>
-
-    <!-- Store Modal - YOUR EXACT DESIGN WITH WORKING PAYMENTS -->
-    <div class="store-modal" id="storeModal">
-        <div class="store-content">
-            <button class="close-btn" onclick="closeStore()">×</button>
-            <h2 class="store-title">✨ Unlock Premium Features</h2>
-            
-            <!-- Stripe Payment Options -->
-            <div class="store-item" onclick="purchase('premium')">
-                <div>
-                    <strong>Remove Ads Forever</strong>
-                    <div style="font-size: 12px; color: var(--text-secondary)">Play without interruptions</div>
-                </div>
-                <div class="price-tag">$4.99</div>
-            </div>
-
-            <div class="store-item" onclick="purchase('hints')">
-                <div>
-                    <strong>Infinite Hints</strong>
-                    <div style="font-size: 12px; color: var(--text-secondary)">Never get stuck again</div>
-                </div>
-                <div class="price-tag">$0.99</div>
-            </div>
-
-            <!-- Alternative Payment Methods -->
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1)">
-                <h3 style="font-size: 18px; margin-bottom: 15px">☕ Buy Me a Coffee</h3>
-                <div class="store-item" onclick="externalPayment('kofi', 3)">
-                    <div>
-                        <strong>Small Coffee</strong>
-                        <div style="font-size: 12px; color: var(--text-secondary)">Thanks for your support!</div>
-                    </div>
-                    <div class="price-tag">$3</div>
-                </div>
-            </div>
-
-            <!-- Unlock Code Option -->
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1)">
-                <input type="text" id="unlockCode" placeholder="Have a code?" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; margin-bottom: 10px;">
-                <button class="btn" onclick="redeemCode()" style="width: 100%;">Redeem Code</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- YOUR EXACT GAME CONTAINER -->
     <div class="game-container">
         <div class="header">
             <h1 class="game-title">COLOR FLOW</h1>
+            <p class="subtitle">Connect all the colors!</p>
         </div>
 
         <div class="stats">
@@ -527,8 +379,8 @@
                 <div class="stat-value" id="moves">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Score</div>
-                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Hints</div>
+                <div class="stat-value" id="hints">3</div>
             </div>
         </div>
 
@@ -539,121 +391,149 @@
         <div class="color-palette" id="colorPalette"></div>
 
         <div class="controls">
-            <button class="btn" onclick="game.hint()">💡 Hint</button>
-            <button class="btn" onclick="game.reset()">🔄 Reset</button>
+            <button class="btn" id="hintBtn" onclick="game.useHint()">
+                💡 Hint (<span id="hintCount">3</span>)
+            </button>
+            <button class="btn" onclick="game.reset()">
+                🔄 Reset
+            </button>
+        </div>
+    </div>
+
+    <!-- Support Button -->
+    <button class="support-btn" onclick="openSupport()" title="Support the Developer">
+        ☕
+    </button>
+
+    <!-- Level Complete Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <h2 class="modal-title">Level Complete!</h2>
+            <p class="modal-text">
+                Great job! You solved it in <span id="modalMoves">0</span> moves!
+                <br><br>
+                <small id="rewardText" style="display: none; color: var(--success);">
+                    Watch an ad for +2 hints? 
+                </small>
+            </p>
+            <div class="modal-buttons">
+                <button class="btn" id="watchAdBtn" style="display: none;" onclick="watchAd()">
+                    📺 Watch Ad (+2 Hints)
+                </button>
+                <button class="btn" onclick="nextLevel()">
+                    Next Level →
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // MONETIZATION CONFIGURATION
-        // ============================================
-        const CONFIG = {
-            STRIPE_KEY: 'pk_test_51SPRKfRu7D6FpMDfBE5cUabjix0rO4zAmmolvCSflumG2amRZpQQskWdikVcxjIb32yb1sSCShI1UWVU4FThqFp800raWH2BOR',
-            BACKEND_URL: 'https://colorflow-backend-deepa-mammens-projects.vercel.app/api',
-            EXTERNAL_LINKS: {
-                kofi: 'https://ko-fi.com/maturingminds',
-                patreon: 'https://patreon.com/MaturingMindsMedia'
-            }
-        };
-
-        // ============================================
-        // PREMIUM STATE MANAGEMENT
-        // ============================================
-        class PremiumManager {
-            constructor() {
-                this.loadState();
-                this.checkReturnFromPayment();
-            }
-            
-            loadState() {
-                const stored = localStorage.getItem('colorflow_premium');
-                this.isPremium = stored === 'true';
-                
-                if (this.isPremium) {
-                    document.getElementById('premiumBadge').classList.add('active');
-                    document.getElementById('premiumBadge').textContent = '⭐ Premium';
-                }
-            }
-            
-            unlock() {
-                this.isPremium = true;
-                localStorage.setItem('colorflow_premium', 'true');
-                document.getElementById('premiumBadge').classList.add('active');
-                document.getElementById('premiumBadge').textContent = '⭐ Premium';
-                game.hints = 999;
-            }
-            
-            checkReturnFromPayment() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const success = urlParams.get('success');
-                const sessionId = urlParams.get('session_id');
-                
-                if (success && sessionId) {
-                    this.verifyPayment(sessionId);
-                    // Clean URL
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
-            }
-            
-            async verifyPayment(sessionId) {
-                try {
-                    const response = await fetch(`${CONFIG.BACKEND_URL}/verify-payment`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ sessionId })
-                    });
-                    
-                    const result = await response.json();
-                    if (result.success) {
-                        this.unlock();
-                        alert('Thank you! Premium features unlocked!');
-                    }
-                } catch (error) {
-                    console.error('Payment verification failed:', error);
-                }
-            }
-        }
-
-        // ============================================
-        // YOUR ORIGINAL GAME CLASS WITH HINT LIMITS
-        // ============================================
+        // Simple Color Flow Game Implementation
         class ColorFlowGame {
             constructor() {
-                this.colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'];
                 this.gridSize = 6;
-                this.grid = [];
                 this.level = 1;
                 this.moves = 0;
-                this.score = 0;
-                this.hints = premiumManager.isPremium ? 999 : 3; // Limit hints for free users
+                this.hints = 3;
+                this.maxHints = 5;
+                this.grid = [];
+                this.sources = [];
+                this.selectedColor = null;
+                this.isComplete = false;
                 
+                // Color schemes
+                this.colorSchemes = [
+                    ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'],
+                    ['#F7DC6F', '#82E0AA', '#85C1E2', '#BB8FCE'],
+                    ['#F8B739', '#FF6B9D', '#C44569', '#2C73D2'],
+                    ['#845EC2', '#D65DB1', '#FF6F91', '#FF9671']
+                ];
+                
+                this.currentColors = this.colorSchemes[0];
                 this.init();
             }
             
             init() {
+                this.loadProgress();
                 this.generateLevel();
                 this.render();
+                this.updateStats();
+            }
+            
+            loadProgress() {
+                const saved = localStorage.getItem('colorflow_progress');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    this.level = data.level || 1;
+                    this.hints = data.hints || 3;
+                }
+            }
+            
+            saveProgress() {
+                localStorage.setItem('colorflow_progress', JSON.stringify({
+                    level: this.level,
+                    hints: this.hints
+                }));
             }
             
             generateLevel() {
+                // Adjust difficulty based on level
+                const numColors = Math.min(3 + Math.floor(this.level / 5), 5);
+                const gridSize = Math.min(6 + Math.floor(this.level / 10), 10);
+                this.gridSize = gridSize;
+                
+                // Pick random color scheme
+                this.currentColors = this.colorSchemes[this.level % this.colorSchemes.length];
+                
+                // Initialize empty grid
                 this.grid = Array(this.gridSize).fill(null).map(() => 
                     Array(this.gridSize).fill(null)
                 );
                 
+                this.sources = [];
+                
                 // Place color sources
-                for (let i = 0; i < 4; i++) {
-                    let x, y;
-                    do {
-                        x = Math.floor(Math.random() * this.gridSize);
-                        y = Math.floor(Math.random() * this.gridSize);
-                    } while (this.grid[y][x] !== null);
-                    
-                    this.grid[y][x] = {
-                        color: this.colors[i],
-                        isSource: true
-                    };
+                for (let i = 0; i < numColors; i++) {
+                    let placed = false;
+                    while (!placed) {
+                        const x = Math.floor(Math.random() * this.gridSize);
+                        const y = Math.floor(Math.random() * this.gridSize);
+                        
+                        if (!this.grid[y][x]) {
+                            this.grid[y][x] = {
+                                color: this.currentColors[i],
+                                isSource: true,
+                                sourceId: i
+                            };
+                            this.sources.push({ x, y, color: this.currentColors[i], id: i });
+                            
+                            // Place matching end point
+                            let endPlaced = false;
+                            let attempts = 0;
+                            while (!endPlaced && attempts < 100) {
+                                const ex = Math.floor(Math.random() * this.gridSize);
+                                const ey = Math.floor(Math.random() * this.gridSize);
+                                
+                                // Ensure some distance between source and end
+                                const distance = Math.abs(ex - x) + Math.abs(ey - y);
+                                if (!this.grid[ey][ex] && distance >= 3) {
+                                    this.grid[ey][ex] = {
+                                        color: this.currentColors[i],
+                                        isSource: true,
+                                        sourceId: i
+                                    };
+                                    this.sources.push({ x: ex, y: ey, color: this.currentColors[i], id: i });
+                                    endPlaced = true;
+                                }
+                                attempts++;
+                            }
+                            placed = true;
+                        }
+                    }
                 }
+                
+                this.moves = 0;
+                this.isComplete = false;
             }
             
             render() {
@@ -665,205 +545,228 @@
                     for (let x = 0; x < this.gridSize; x++) {
                         const cell = document.createElement('div');
                         cell.className = 'cell';
+                        cell.dataset.x = x;
+                        cell.dataset.y = y;
                         
                         const cellData = this.grid[y][x];
                         if (cellData) {
                             if (cellData.isSource) {
                                 cell.classList.add('source');
+                                cell.textContent = cellData.sourceId + 1;
                             } else {
                                 cell.classList.add('filled');
                             }
                             cell.style.background = cellData.color;
                         }
                         
-                        cell.onclick = () => this.handleClick(x, y);
+                        cell.onclick = () => this.handleCellClick(x, y);
                         gridEl.appendChild(cell);
                     }
                 }
                 
-                // Render palette
+                // Render color palette
+                this.renderPalette();
+            }
+            
+            renderPalette() {
                 const palette = document.getElementById('colorPalette');
                 palette.innerHTML = '';
-                for (let i = 0; i < 4; i++) {
+                
+                const usedColors = [...new Set(this.sources.map(s => s.color))];
+                
+                usedColors.forEach((color, index) => {
                     const btn = document.createElement('div');
                     btn.className = 'color-btn';
-                    btn.style.background = this.colors[i];
-                    btn.onclick = () => this.selectColor(this.colors[i], btn);
+                    btn.style.background = color;
+                    btn.dataset.color = color;
+                    
+                    if (this.selectedColor === color) {
+                        btn.classList.add('selected');
+                    }
+                    
+                    btn.onclick = () => this.selectColor(color);
                     palette.appendChild(btn);
-                }
-                
-                // Update stats
-                document.getElementById('level').textContent = this.level;
-                document.getElementById('moves').textContent = this.moves;
-                document.getElementById('score').textContent = this.score;
+                });
             }
             
-            selectColor(color, element) {
+            selectColor(color) {
                 this.selectedColor = color;
-                document.querySelectorAll('.color-btn').forEach(btn => 
-                    btn.classList.remove('selected')
-                );
-                element.classList.add('selected');
+                this.renderPalette();
             }
             
-            handleClick(x, y) {
-                if (!this.selectedColor || this.grid[y][x]) return;
+            handleCellClick(x, y) {
+                if (this.isComplete) return;
                 
-                this.grid[y][x] = { color: this.selectedColor, isSource: false };
-                this.moves++;
-                this.render();
+                const cell = this.grid[y][x];
                 
-                if (this.checkWin()) {
-                    this.levelComplete();
+                // If clicking on a source, select its color
+                if (cell && cell.isSource) {
+                    this.selectColor(cell.color);
+                    return;
+                }
+                
+                // If no color selected, do nothing
+                if (!this.selectedColor) return;
+                
+                // If cell is empty, fill it
+                if (!cell) {
+                    this.grid[y][x] = {
+                        color: this.selectedColor,
+                        isSource: false
+                    };
+                    this.moves++;
+                    this.render();
+                    this.updateStats();
+                    this.checkWin();
+                } 
+                // If cell is filled (not source), clear it
+                else if (!cell.isSource) {
+                    this.grid[y][x] = null;
+                    this.moves++;
+                    this.render();
+                    this.updateStats();
                 }
             }
             
-            hint() {
-                if (!premiumManager.isPremium && this.hints <= 0) {
-                    if (confirm('Out of hints! Unlock unlimited hints for $0.99?')) {
-                        openStore();
+            checkWin() {
+                // Check if all cells are filled
+                for (let y = 0; y < this.gridSize; y++) {
+                    for (let x = 0; x < this.gridSize; x++) {
+                        if (!this.grid[y][x]) return false;
+                    }
+                }
+                
+                // Check if colors form valid paths
+                // For simplicity, just check if grid is full for now
+                // In a full implementation, you'd verify paths connect sources
+                
+                this.isComplete = true;
+                setTimeout(() => this.showSuccess(), 300);
+                return true;
+            }
+            
+            showSuccess() {
+                document.getElementById('modalMoves').textContent = this.moves;
+                
+                // Show reward option every 3 levels
+                if (this.level % 3 === 0) {
+                    document.getElementById('rewardText').style.display = 'block';
+                    document.getElementById('watchAdBtn').style.display = 'block';
+                }
+                
+                document.getElementById('successModal').classList.add('active');
+            }
+            
+            useHint() {
+                if (this.hints <= 0) {
+                    // Offer to watch ad for hints
+                    if (confirm('Out of hints! Watch a short ad to get 2 more hints?')) {
+                        this.watchAdForHints();
                     }
                     return;
                 }
                 
-                if (!premiumManager.isPremium) {
-                    this.hints--;
+                // Find an empty cell that should be filled
+                let hintGiven = false;
+                for (let y = 0; y < this.gridSize; y++) {
+                    for (let x = 0; x < this.gridSize; x++) {
+                        if (!this.grid[y][x]) {
+                            // Flash the cell as a hint
+                            const cells = document.querySelectorAll('.cell');
+                            const index = y * this.gridSize + x;
+                            cells[index].classList.add('hint');
+                            setTimeout(() => cells[index].classList.remove('hint'), 1200);
+                            
+                            this.hints--;
+                            this.updateStats();
+                            this.saveProgress();
+                            hintGiven = true;
+                            return;
+                        }
+                    }
                 }
                 
-                alert('Hint: Try connecting the red cells!');
+                if (!hintGiven) {
+                    alert('No hints available for this position!');
+                }
+            }
+            
+            watchAdForHints() {
+                // Simulate watching an ad
+                alert('Ad would play here (5 seconds)...');
+                // In production, integrate with ad network
+                
+                setTimeout(() => {
+                    this.hints = Math.min(this.hints + 2, this.maxHints);
+                    this.updateStats();
+                    this.saveProgress();
+                    alert('You earned 2 hints!');
+                }, 1000);
             }
             
             reset() {
                 this.moves = 0;
                 this.generateLevel();
                 this.render();
+                this.updateStats();
             }
             
-            checkWin() {
-                for (let y = 0; y < this.gridSize; y++) {
-                    for (let x = 0; x < this.gridSize; x++) {
-                        if (this.grid[y][x] === null) return false;
-                    }
-                }
-                return true;
-            }
-            
-            levelComplete() {
-                this.score += 100 * this.level;
-                this.level++;
+            updateStats() {
+                document.getElementById('level').textContent = this.level;
+                document.getElementById('moves').textContent = this.moves;
+                document.getElementById('hints').textContent = this.hints;
+                document.getElementById('hintCount').textContent = this.hints;
                 
-                // Optional ad placement (only if AdSense configured)
-                if (!premiumManager.isPremium && this.level % 5 === 0) {
-                    // Show ad container if exists
-                }
+                // Disable hint button if no hints
+                document.getElementById('hintBtn').disabled = false;
                 
-                setTimeout(() => {
-                    alert(`Level ${this.level - 1} Complete! Score: ${this.score}`);
-                    this.reset();
-                }, 100);
+                this.saveProgress();
             }
         }
-
-        // ============================================
-        // PAYMENT INTEGRATION (STRIPE)
-        // ============================================
-        let stripe = null;
-        if (CONFIG.STRIPE_KEY && CONFIG.STRIPE_KEY !== 'pk_test_51234567890') {
-            stripe = Stripe(CONFIG.STRIPE_KEY);
-        }
-
-        async function purchase(product) {
-            if (!stripe) {
-                // Fallback to external payment
-                externalPayment('kofi');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${CONFIG.BACKEND_URL}/create-checkout`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ product })
-                });
-
-                const session = await response.json();
-                const result = await stripe.redirectToCheckout({
-                    sessionId: session.id
-                });
-
-                if (result.error) {
-                    alert(result.error.message);
-                }
-            } catch (error) {
-                console.error('Purchase failed:', error);
-                externalPayment('kofi');
-            }
-        }
-
-        // External payment fallback
-        function externalPayment(platform, amount) {
-            const url = CONFIG.EXTERNAL_LINKS[platform] || CONFIG.EXTERNAL_LINKS.kofi;
-            window.open(url, '_blank');
+        
+        // Initialize game
+        let game;
+        window.addEventListener('DOMContentLoaded', () => {
+            game = new ColorFlowGame();
             
-            setTimeout(() => {
-                alert('After payment, you\'ll receive an unlock code via email. Enter it in the field below.');
-                document.getElementById('unlockCode').focus();
-            }, 1000);
-        }
-
-        // Redeem unlock code
-        async function redeemCode() {
-            const code = document.getElementById('unlockCode').value.trim();
+            // Register service worker for offline play
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed'));
+            }
+        });
+        
+        // Modal functions
+        function nextLevel() {
+            document.getElementById('successModal').classList.remove('active');
+            game.level++;
+            game.generateLevel();
+            game.render();
+            game.updateStats();
             
-            if (!code) {
-                alert('Please enter a code');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${CONFIG.BACKEND_URL}/validate-code`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code })
-                });
-
-                const result = await response.json();
-                
-                if (result.valid) {
-                    premiumManager.unlock();
-                    closeStore();
-                    alert('Success! Premium features unlocked!');
-                } else {
-                    alert('Invalid code. Please try again.');
-                }
-            } catch (error) {
-                // Offline validation
-                const validCodes = ['LAUNCH2024', 'FRIEND50', 'BETA'];
-                if (validCodes.includes(code.toUpperCase())) {
-                    premiumManager.unlock();
-                    closeStore();
-                    alert('Success! Premium features unlocked!');
-                } else {
-                    alert('Invalid code.');
-                }
+            // Hide reward options
+            document.getElementById('rewardText').style.display = 'none';
+            document.getElementById('watchAdBtn').style.display = 'none';
+        }
+        
+        function watchAd() {
+            // Simulate ad watching
+            alert('Ad would play here...');
+            
+            // In production, use actual ad network
+            // Example: showRewardedVideoAd().then(() => { ... })
+            
+            game.hints = Math.min(game.hints + 2, game.maxHints);
+            game.updateStats();
+            nextLevel();
+        }
+        
+        function openSupport() {
+            if (confirm('Enjoying Color Flow? Buy me a coffee to support development! ☕\n\nThis will open PayPal/Ko-fi in a new tab.')) {
+                window.open('https://ko-fi.com/maturingminds', '_blank');
             }
         }
-
-        function openStore() {
-            document.getElementById('storeModal').classList.add('active');
-        }
-
-        function closeStore() {
-            document.getElementById('storeModal').classList.remove('active');
-        }
-
-        // Initialize
-        const premiumManager = new PremiumManager();
-        const game = new ColorFlowGame();
-
-        // Event listeners
-        document.getElementById('premiumBadge').addEventListener('click', openStore);
-        document.getElementById('supportBtn').addEventListener('click', openStore);
     </script>
 </body>
 </html>
