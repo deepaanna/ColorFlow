@@ -5,11 +5,6 @@ const urlsToCache = [
   '/index.html',
   '/manifest.json'
 ];
-const CACHE_ASSETS = [
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
-];
 
 // Install event - cache assets
 self.addEventListener('install', event => {
